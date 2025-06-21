@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Watchlist</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .rating-stars { color: gold; font-size: 1.2rem; }
+    </style>
+</head>
+<body class="bg-dark text-white">
+
+    <div class="container mt-3">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <div class="container mt-5">
+        <h1>My Watchlist</h1>
+        <a href="/" class="btn btn-secondary mb-3">Back to Search</a>
+        
+        <div class="row">
+            {% for movie in movies %}
+            <div class="col-md-4 mb-4">
+                <div class="card bg-secondary text-white">
+                    <img src="{{ movie.poster }}" class="card-img-top">
+                    <div class="card-body">
+                        <h5>{{ movie.title }} ({{ movie.year }})</h5>
+                        
+                        <!-- Display current rating -->
+                        {% if movie.rating %}
+                        <div class="rating-stars mb-2">
+                            {% for _ in range(movie.rating) %}⭐{% endfor %}
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Rating form -->
+                        <form action="/rate/{{ movie.id }}" method="POST" class="mb-2">
+                            <select name="rating" class="form-select form-select-sm">
+                                <option value="">Rate this movie...</option>
+                                <option value="1" {% if movie.rating == 1 %}selected{% endif %}>⭐ (1)</option>
+                                <option value="2" {% if movie.rating == 2 %}selected{% endif %}>⭐⭐ (2)</option>
+                                <option value="3" {% if movie.rating == 3 %}selected{% endif %}>⭐⭐⭐ (3)</option>
+                                <option value="4" {% if movie.rating == 4 %}selected{% endif %}>⭐⭐⭐⭐ (4)</option>
+                                <option value="5" {% if movie.rating == 5 %}selected{% endif %}>⭐⭐⭐⭐⭐ (5)</option>
+                            </select>
+                            <button type="submit" class="btn btn-warning btn-sm mt-2">Save Rating</button>
+                        </form>
+
+                        <form action="/toggle_watched/{{ movie.id }}" method="POST" class="mb-2">
+                            <button type="submit" class="btn btn-sm {% if movie.watched %}btn-success{% else %}btn-outline-success{% endif %} w-100">
+                                {% if movie.watched %}
+                                ✅ Watched
+                                {% else %}
+                                Mark as Watched
+                                {% endif %}
+                            </button>
+                        </form>
+                        
+                        <!-- Delete button -->
+                        <form action="/delete/{{ movie.id }}" method="POST">
+                            <button type="submit" class="btn btn-danger btn-sm">🗑️ Delete</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="col-12">
+                <p>Your watchlist is empty. Search for movies to add some!</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
