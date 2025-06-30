@@ -12,7 +12,7 @@ app.secret_key = 'your-secret-key-here'
 # import secrets
 # app.secret_key = secrets.token_hex(16)  # Generates a 32-character random hex string
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///watchlist.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///watchlist.db').replace("postgres://", "postgresql://", 1)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
@@ -30,7 +30,7 @@ class Movie(db.Model):
 with app.app_context():
     db.create_all()
 
-
+    
 
 # Homepage route
 @app.route('/')
@@ -129,4 +129,4 @@ def debug_db():
     }
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=10000)  
